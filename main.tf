@@ -94,7 +94,7 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
   }
 
   logging_config {
-    bucket = "${var.audit_bucket}"
+    bucket = "${var.audit_bucket}.s3.amazonaws.com"
     prefix = "cloudfront/${var.project}"
   }
 
