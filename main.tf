@@ -3,9 +3,14 @@ variable "origin_id" {}
 variable "alias" {}
 variable "acm_certificate_arn" {}
 variable "project" {}
+variable "audit_bucket" {}
 
 variable "price_class" {
   default = "PriceClass_100"
+}
+
+variable "ipv6_enabled" {
+  default = true
 }
 
 variable "minimum_protocol_version" {
@@ -55,6 +60,7 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
   }
 
   enabled             = "${var.distribution_enabled}"
+  is_ipv6_enabled     = "${var.ipv6_enabled}"
   comment             = "${var.comment}"
   default_root_object = "${var.default_root_object}"
 
@@ -85,6 +91,11 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
     geo_restriction {
       restriction_type = "none"
     }
+  }
+
+  logging_config {
+    bucket = "${var.audit_bucket}"
+    prefix = "cloudfront/${var.project}"
   }
 
   viewer_certificate {
