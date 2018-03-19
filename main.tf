@@ -1,4 +1,4 @@
-variable "origin_domain_name" {}
+variable "bucket_name" {}
 variable "origin_id" {}
 variable "alias" {}
 variable "acm_certificate_arn" {}
@@ -17,18 +17,6 @@ variable "minimum_protocol_version" {
   default = "TLSv1.1_2016"
 }
 
-variable "origin_path" {
-  default = ""
-}
-
-variable "origin_http_port" {
-  default = 80
-}
-
-variable "origin_https_port" {
-  default = 443
-}
-
 variable "distribution_enabled" {
   default = true
 }
@@ -45,18 +33,18 @@ variable "compression" {
   default = false
 }
 
+/*
+  ---------------------------
+  | CloudFront Distribution |
+  ---------------------------
+
 resource "aws_cloudfront_distribution" "ssl_distribution" {
   origin {
     domain_name = "${var.origin_domain_name}"
     origin_id   = "${var.origin_id}"
-    origin_path = "${var.origin_path}"
 
-    custom_origin_config {
-      http_port              = "${var.origin_http_port}"
-      https_port             = "${var.origin_https_port}"
-      origin_protocol_policy = "https-only"                    # Only talk to the origin over HTTPS
-      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-    }
+  s3_origin_config {
+    origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.aws_cloudfront_origin_access_identity}"
   }
 
   enabled             = "${var.distribution_enabled}"
@@ -108,4 +96,59 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
     managed_by = "Terraform"
     project    = "${var.project}"
   }
+}
+
+/*
+  -------------------
+  | S3 Bucket Setup |
+  -------------------
+*/
+
+# configure S3 bucket to host CloudFront presented files
+resource "aws_s3_bucket" "cloudfront_bucket" {
+  bucket = "${var.bucket_name}"
+
+  website {
+    index_document = "index.html"
+    error_document = "404.html"
+    routing_rules  = "${var.routing_rules}"
+  }
+
+  tags {
+    managed_by = "Terraform"
+    project    = "${var.project}"
+  }
+}
+
+# configure access policy for CloudFront to hit our S3 bucket
+data "aws_iam_policy_document" "s3_policy" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${module.names.s3_endpoint_arn_base}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+
+  statement {
+    actions   = ["s3:ListBucket"]
+    resources = ["${module.names.s3_endpoint_arn_base}"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+}
+
+/*
+ ------------------
+ | CloudFront OAI |
+ ------------------
+*/
+
+resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
+  comment = "${var.comment}"
 }

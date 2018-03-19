@@ -1,6 +1,8 @@
-# partinfra-terraform-cloudfrontssl
+# tf-cloudfronts3
+
 ## Introduction
 A Terraform module to easily create an SSL-enabled CloudFront distribution for a custom domain.
+
 ### Get Involved
 * [Community Ops Wiki Page](https://wiki.mozilla.org/Community_Ops)
 * Communication:
