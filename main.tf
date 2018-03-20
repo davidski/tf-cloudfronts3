@@ -34,17 +34,29 @@ variable "compression" {
 }
 
 /*
+ ------------------
+ | CloudFront OAI |
+ ------------------
+*/
+
+resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
+  comment = "${var.comment}"
+}
+
+/*
   ---------------------------
   | CloudFront Distribution |
   ---------------------------
+*/
 
 resource "aws_cloudfront_distribution" "ssl_distribution" {
   origin {
-    domain_name = "${var.origin_domain_name}"
+    domain_name = "${aws_s3_bucket.cloudfront_bucket.bucket_domain_name}"
     origin_id   = "${var.origin_id}"
 
-  s3_origin_config {
-    origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.aws_cloudfront_origin_access_identity}"
+    s3_origin_config {
+      origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path}"
+    }
   }
 
   enabled             = "${var.distribution_enabled}"
@@ -108,10 +120,12 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
 resource "aws_s3_bucket" "cloudfront_bucket" {
   bucket = "${var.bucket_name}"
 
-  website {
-    index_document = "index.html"
-    error_document = "404.html"
-    routing_rules  = "${var.routing_rules}"
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
   }
 
   tags {
@@ -120,11 +134,18 @@ resource "aws_s3_bucket" "cloudfront_bucket" {
   }
 }
 
+# apply bucket policy to the S3 bucket
+resource "aws_s3_bucket_policy" "b" {
+  bucket = "${aws_s3_bucket.cloudfront_bucket.id}"
+  policy = "${data.aws_iam_policy_document.s3_policy.json}"
+}
+
 # configure access policy for CloudFront to hit our S3 bucket
 data "aws_iam_policy_document" "s3_policy" {
   statement {
-    actions   = ["s3:GetObject"]
-    resources = ["${module.names.s3_endpoint_arn_base}/*"]
+    actions = ["s3:GetObject"]
+
+    resources = ["${aws_s3_bucket.cloudfront_bucket.arn}/*"]
 
     principals {
       type        = "AWS"
@@ -134,21 +155,11 @@ data "aws_iam_policy_document" "s3_policy" {
 
   statement {
     actions   = ["s3:ListBucket"]
-    resources = ["${module.names.s3_endpoint_arn_base}"]
+    resources = ["${aws_s3_bucket.cloudfront_bucket.arn}"]
 
     principals {
       type        = "AWS"
       identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
     }
   }
-}
-
-/*
- ------------------
- | CloudFront OAI |
- ------------------
-*/
-
-resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
-  comment = "${var.comment}"
 }
