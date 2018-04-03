@@ -19,7 +19,7 @@ EOF
 }
 
 resource "aws_lambda_function" "cloudfront_lambda" {
-  filename         = "cloudfront.js"
+  filename         = "${path.module}/cloudfront.js"
   function_name    = "cloudfront_aws"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "exports.handler"
