@@ -18,6 +18,13 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
+resource "aws_lambda_permission" "allow_cloudfront" {
+  statement_id  = "AllowExecutionFromCloudFront"
+  action        = "lambda:GetFunction"
+  function_name = "${aws_lambda_function.cloudfront_lambda.function_name}"
+  principal     = "edgelambda.amazonaws.com"
+}
+
 resource "aws_lambda_function" "cloudfront_lambda" {
   filename         = "${path.module}/cloudfront.zip"
   function_name    = "cloudfront_aws"
