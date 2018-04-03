@@ -74,8 +74,8 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
     compress         = "${var.compression}"
 
     lambda_function_association {
-      event_type = "viewer-request"
-      lambda_arn = ""
+      event_type = "origin-request"
+      lambda_arn = "${aws_lamda_function.cloudfront_lambda}"
     }
 
     forwarded_values {
