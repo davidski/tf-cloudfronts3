@@ -1,3 +1,9 @@
+/*
+ ------------------------
+ | Define our IAM setup |
+ ------------------------
+*/
+
 data "aws_iam_policy_document" "lambda" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -14,7 +20,7 @@ data "aws_iam_policy_document" "lambda" {
 }
 
 resource "aws_iam_role" "iam_for_lambda" {
-  name               = "iam_for_lambda"
+  name_prefix        = "iam_for_cloudwatch_lambda"
   assume_role_policy = "${data.aws_iam_policy_document.lambda.json}"
 }
 
@@ -48,12 +54,12 @@ data "archive_file" "rewrite" {
 
 resource "aws_lambda_function" "cloudfront_lambda" {
   provider         = "aws.east"
-  filename         = "${path.module}/.zip/cloudfront.zip"
+  filename         = "${data.archive_file.rewrite.output_path}"
+  source_code_hash = "${data.archive_file.rewrite.output_base64sha256}"
   function_name    = "cloudfront_aws"
   publish          = true
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "exports.handler"
-  source_code_hash = "${base64sha256(file("${path.module}/.zip/cloudfront.zip"))}"
   runtime          = "nodejs6.10"
   description      = "Cloudfront Lambda@Edge redirects all bare urls to index.html"
 
