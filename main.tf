@@ -80,7 +80,7 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
 
     lambda_function_association {
       event_type = "origin-request"
-      lambda_arn = "${aws_lambda_function.cloudfront_lambda.arn}:latest"
+      lambda_arn = "${aws_lambda_function.cloudfront_lambda.arn}:${aws_lambda_function.cloudfront_lambda.version}"
     }
 
     forwarded_values {
