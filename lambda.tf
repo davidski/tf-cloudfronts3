@@ -57,10 +57,10 @@ resource "aws_lambda_function" "cloudfront_lambda" {
   provider         = "aws.east"
   filename         = "${data.archive_file.rewrite.output_path}"
   source_code_hash = "${data.archive_file.rewrite.output_base64sha256}"
-  function_name    = "cloudfront_aws"
+  function_name    = "${var.project}_cloudfront_aws"
   publish          = true
   role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "${var.project}.cloudfront.handler"
+  handler          = "cloudfront.handler"
   runtime          = "nodejs6.10"
   description      = "Cloudfront Lambda@Edge redirects all bare urls to index.html"
 
