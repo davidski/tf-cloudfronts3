@@ -1,6 +1,8 @@
 variable "bucket_name" {}
 variable "origin_id" {}
-variable "alias" {}
+variable "alias" {
+  type = "list"
+}
 variable "acm_certificate_arn" {}
 variable "project" {}
 variable "audit_bucket" {}
@@ -36,7 +38,6 @@ variable "compression" {
 provider "aws" {
   alias  = "east"
   region = "us-east-1"
-
   version = "~> 1.54"
 }
 
@@ -88,6 +89,12 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
     forwarded_values {
       query_string = false
 
+      headers = [
+        "Access-Control-Request-Headers", 
+        "Access-Control-Request-Method",
+        "Origin"
+        ]
+
       cookies {
         forward = "none"
       }
@@ -138,6 +145,12 @@ resource "aws_s3_bucket" "cloudfront_bucket" {
         sse_algorithm = "AES256"
       }
     }
+  }
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = "${formatlist("https://%s", var.alias)}"
+    max_age_seconds = 3000
   }
 
   tags {
