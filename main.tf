@@ -47,6 +47,10 @@ provider "archive" {
   version = "~> 1.2.0"
 }
 
+provider "random_id" {
+  version = "~> 2.1.0"
+}
+
 /*
  ------------------
  | CloudFront OAI |
