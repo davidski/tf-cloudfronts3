@@ -66,7 +66,7 @@ resource "aws_lambda_function" "cloudfront_lambda" {
   provider         = "aws.east"
   filename         = "${data.archive_file.rewrite.output_path}"
   source_code_hash = "${data.archive_file.rewrite.output_base64sha256}"
-  function_name    = "${var.project}_cloudfront_aws_{$random_id.function.hex}"
+  function_name    = "${var.project}_cloudfront_aws_${random_id.function.hex}"
   publish          = true
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "cloudfront.handler"
