@@ -43,6 +43,15 @@ resource "aws_lambda_permission" "allow_cloudfront" {
  -----------------------
 */
 
+resource "random_id" "function" {
+  keepers = {
+    # Generate a new id each time we switch to a new project
+    ami_id = "${var.project}"
+  }
+
+  byte_length = 8
+}
+
 data "archive_file" "rewrite" {
   type        = "zip"
   output_path = "${path.module}/.zip/cloudfront.zip"
@@ -57,7 +66,7 @@ resource "aws_lambda_function" "cloudfront_lambda" {
   provider         = "aws.east"
   filename         = "${data.archive_file.rewrite.output_path}"
   source_code_hash = "${data.archive_file.rewrite.output_base64sha256}"
-  function_name    = "${var.project}_cloudfront_aws"
+  function_name    = "${var.project}_cloudfront_aws_{$random_id.function.hex}"
   publish          = true
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "cloudfront.handler"
