@@ -47,7 +47,7 @@ provider "archive" {
   version = "~> 1.2.0"
 }
 
-provider "random_id" {
+provider "random" {
   version = "~> 2.1.0"
 }
 
