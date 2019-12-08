@@ -30,7 +30,6 @@ resource "aws_iam_role_policy_attachment" "basic" {
 }
 
 resource "aws_lambda_permission" "allow_cloudfront" {
-  provider      = aws.us-east-1
   statement_id  = "AllowExecutionFromCloudFront"
   action        = "lambda:GetFunction"
   function_name = aws_lambda_function.cloudfront_lambda.function_name
@@ -63,7 +62,6 @@ data "archive_file" "rewrite" {
 }
 
 resource "aws_lambda_function" "cloudfront_lambda" {
-  provider         = aws.us-east-1
   filename         = data.archive_file.rewrite.output_path
   source_code_hash = data.archive_file.rewrite.output_base64sha256
   function_name    = "${var.project}_cloudfront_aws_${random_id.function.hex}"
