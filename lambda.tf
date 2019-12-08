@@ -68,7 +68,7 @@ resource "aws_lambda_function" "cloudfront_lambda" {
   publish          = true
   role             = aws_iam_role.iam_for_lambda.arn
   handler          = "cloudfront.handler"
-  runtime          = "nodejs12.x"
+  runtime          = "nodejs10.x"
   description      = "Cloudfront Lambda@Edge redirects all bare urls to index.html"
 
   tags = {
