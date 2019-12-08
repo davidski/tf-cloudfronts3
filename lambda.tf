@@ -45,7 +45,7 @@ resource "aws_lambda_permission" "allow_cloudfront" {
 resource "random_id" "function" {
   keepers = {
     # Generate a new id each time we switch to a new project
-    ami_id = "${var.project}"
+    ami_id = var.project
   }
 
   byte_length = 8
@@ -71,7 +71,7 @@ resource "aws_lambda_function" "cloudfront_lambda" {
   runtime          = "nodejs12.x"
   description      = "Cloudfront Lambda@Edge redirects all bare urls to index.html"
 
-  tags {
+  tags = {
     managed_by = "Terraform"
     project    = var.project
   }

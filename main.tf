@@ -43,7 +43,7 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
   comment             = var.comment
   default_root_object = var.default_root_object
 
-  aliases     = [var.alias]
+  aliases     = var.alias
   price_class = var.price_class
 
   default_cache_behavior {
@@ -94,7 +94,7 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
     minimum_protocol_version = var.minimum_protocol_version
   }
 
-  tags {
+  tags = {
     managed_by = "Terraform"
     project    = var.project
   }
@@ -125,7 +125,7 @@ resource "aws_s3_bucket" "cloudfront_bucket" {
     max_age_seconds = 3000
   }
 
-  tags {
+  tags = {
     managed_by = "Terraform"
     project    = var.project
   }
