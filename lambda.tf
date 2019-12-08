@@ -63,7 +63,7 @@ data "archive_file" "rewrite" {
 }
 
 resource "aws_lambda_function" "cloudfront_lambda" {
-  provider         = "aws.east"
+  provider         = aws.east
   filename         = data.archive_file.rewrite.output_path
   source_code_hash = data.archive_file.rewrite.output_base64sha256
   function_name    = "${var.project}_cloudfront_aws_${random_id.function.hex}"
