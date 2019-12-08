@@ -30,7 +30,7 @@ resource "aws_iam_role_policy_attachment" "basic" {
 }
 
 resource "aws_lambda_permission" "allow_cloudfront" {
-  provider      = "aws.east"
+  provider      = aws.east
   statement_id  = "AllowExecutionFromCloudFront"
   action        = "lambda:GetFunction"
   function_name = aws_lambda_function.cloudfront_lambda.function_name
