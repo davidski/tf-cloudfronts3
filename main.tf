@@ -4,6 +4,10 @@ provider "aws" {
   version = "~> 2.7"
 }
 
+provier "aws" {
+  alias = "bucket"
+}
+
 provider "archive" {
   version = "~> 1.2.0"
 }
