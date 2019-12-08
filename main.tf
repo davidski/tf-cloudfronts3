@@ -108,6 +108,7 @@ resource "aws_cloudfront_distribution" "ssl_distribution" {
 
 # configure S3 bucket to host CloudFront presented files
 resource "aws_s3_bucket" "cloudfront_bucket" {
+  provider = aws.bucket
   bucket = var.bucket_name
 
   server_side_encryption_configuration {
@@ -133,6 +134,7 @@ resource "aws_s3_bucket" "cloudfront_bucket" {
 
 # apply bucket policy to the S3 bucket
 resource "aws_s3_bucket_policy" "b" {
+  provider = aws.bucket
   bucket = aws_s3_bucket.cloudfront_bucket.id
   policy = data.aws_iam_policy_document.s3_policy.json
 }
