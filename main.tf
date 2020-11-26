@@ -1,7 +1,6 @@
 
 
 provider "aws" {
-  version = "~> 2.7"
 }
 
 provider "aws" {
@@ -9,11 +8,9 @@ provider "aws" {
 }
 
 provider "archive" {
-  version = "~> 1.2.0"
 }
 
 provider "random" {
-  version = "~> 2.1.0"
 }
 
 /*
