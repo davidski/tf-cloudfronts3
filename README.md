@@ -1,5 +1,7 @@
 # tf-cloudfronts3
 
+This repository is archived and is no longer maintained.
+
 ## Introduction
 A Terraform module to easily create an SSL-enabled CloudFront distribution for a custom domain, using an S3 bucket (REST end-point and not using S3 web hosting) as the origin.
 
